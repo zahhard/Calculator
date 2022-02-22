@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import com.example.calc.databinding.ActivityMainBinding
+import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.Exception
 import kotlin.properties.Delegates
 
@@ -53,6 +54,7 @@ class MainActivity : AppCompatActivity() {
         binding.plus.setOnClickListener (::operatorClicked)
         binding.minus.setOnClickListener (::operatorClicked)
         binding.btnRadical.setOnClickListener(::del)
+        binding.equals.setOnClickListener(::equals)
     }
 
     private fun numberClicked(view: View){
@@ -86,10 +88,27 @@ class MainActivity : AppCompatActivity() {
         binding.textTow.text = ""
     }
 
+    private fun equals(view: View){
+        this.textTow.text = calcRes()
+    }
+
+    private fun calcRes(): String{
+        var digits = calcDigits()
+        if (digits.isEmpty())
+            return ""
+
+        var turn1 = turn(digits)
+        if (turn1.isEmpty())
+            return ""
+
+        val result = addPlusAndMinuce(turn1)
+        return result.toString()
+    }
+
     private fun calcDigits(): MutableList<Any>{
         val listOfAllThings = mutableListOf<Any>()
         var num = ""
-        for (char in binding.textOne.text){
+        for (char in textOne.text){
             if (char.isDigit() || char == '.'){
                 num += char
             }
@@ -106,30 +125,92 @@ class MainActivity : AppCompatActivity() {
         return listOfAllThings
     }
 
-    private fun calcRes(): String{
-        var digits = calcDigits()
-        if (digits.isEmpty())
-            return ""
 
-        else {
+    private fun addPlusAndMinuce(list: MutableList<Any>): Float {
+        var result = list[0] as Float
 
-            if (digits.contains("x") || digits.contains("/")){
-                var temp = ArrayList<Any>()
-                var xIndex = digits.indexOf("x")
-                var divIndex = digits.indexOf("/")
-                if (xIndex < divIndex){
-
-                    for (i in 0..xIndex-2){
-                        temp.add(digits[i])
-                    }
-                    calculator.multi(digits[xIndex-1] as Float, digits[xIndex+1] as Float)
-
+        for (o in list.indices){
+            if (list[o] is Char && o != list.lastIndex){
+                val operator = list[o]
+               // var first = list[o-1] as Float
+                var second = list[o+1] as Float
+                if (operator == '+'){
+                    result = calculator.plus(second)
                 }
-
+                if (operator == '-'){
+                   result = calculator.mines(second)
+                }
             }
         }
-        return ""
+
+        return result
     }
+
+    fun turn(digits: MutableList<Any>): MutableList<Any>{
+        var list = digits
+
+        while (list.contains('x') || list.contains('/')){
+            var newList = list
+            var restartIndex = newList.size
+
+            for (i in newList.indices){
+                var lastList = ArrayList<Any>()
+                if (newList[i] is Char && i != newList.size && i < restartIndex){
+                    var operator = newList[i]
+                    var first = newList[i-1] as Float
+                    var second = newList[i+1] as Float
+                    if (operator == "x"){
+                        calculator.multi(first, second)
+                    }
+                    else if (operator == "/"){
+                        calculator.division(first, second)
+                    }
+                    else{
+                        lastList.add(first)
+                        lastList.add(operator)
+                        lastList.add(second)
+                    }
+                }
+                if (i > restartIndex){
+                    lastList.add(newList[i])
+                }
+            }
+
+        }
+        return list
+    }
+
+    private fun calcTurn(list: MutableList<Any>): MutableList<Any>{
+        var newList = list
+        var restartIndex = newList.size
+
+        for (i in list.indices){
+            if (list[i] is Char && i != list.lastIndex && i < restartIndex){
+                var operator = list[i]
+                var first = list[i-1] as Float
+                var second = list[i+1] as Float
+                if (operator == 'x'){
+                    newList.add(calculator.multi(first, second))
+                }
+                else if (operator == '/'){
+                    newList.add(calculator.division(first, second))
+                }
+                else{
+                    newList.add(first)
+                    newList.add(operator)
+                    newList.add(second)
+                }
+            }
+            if (i > restartIndex){
+                newList.add(list[i])
+            }
+        }
+
+
+    return newList
+    }
+
+
 }
 
 
