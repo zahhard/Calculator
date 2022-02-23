@@ -13,10 +13,10 @@
         android:layout_height="65dp"
         android:layout_margin="8dp"
         android:ellipsize="end"
+        android:padding="12dp"
         android:singleLine="true"
-        android:textColor="@color/white"
-        android:textSize="30sp"
-        android:padding="12dp"/>
+        android:textColor="#B5B2B2"
+        android:textSize="27sp" />
 
     <TextView
         android:id="@+id/textTow"
@@ -24,10 +24,10 @@
         android:layout_height="65dp"
         android:layout_margin="8dp"
         android:ellipsize="marquee"
+        android:padding="12dp"
         android:singleLine="true"
         android:textColor="@color/white"
-        android:textSize="30sp"
-        android:padding="12dp" />
+        android:textSize="31sp" />
 
 
     <LinearLayout
