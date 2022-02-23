@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun equals(view: View){
-        this.textTow.text = calcRes()
+        binding.textTow.text = calcRes()
     }
 
     private fun calcRes(): String{
@@ -123,86 +123,58 @@ class MainActivity : AppCompatActivity() {
         }
 
         return listOfAllThings
+
     }
 
 
     private fun addPlusAndMinuce(list: MutableList<Any>): Float {
         var result = list[0] as Float
-
         for (o in list.indices){
             if (list[o] is Char && o != list.lastIndex){
                 val operator = list[o]
-               // var first = list[o-1] as Float
                 var second = list[o+1] as Float
                 if (operator == '+'){
-                    result = calculator.plus(second)
+                    result += second
                 }
                 if (operator == '-'){
-                   result = calculator.mines(second)
+                   result -= second
                 }
             }
         }
-
         return result
     }
 
-    fun turn(digits: MutableList<Any>): MutableList<Any>{
+    private fun turn(digits: MutableList<Any>): MutableList<Any>{
         var list = digits
-
         while (list.contains('x') || list.contains('/')){
-            var newList = list
-            var restartIndex = newList.size
-
-            for (i in newList.indices){
-                var lastList = ArrayList<Any>()
-                if (newList[i] is Char && i != newList.size && i < restartIndex){
-                    var operator = newList[i]
-                    var first = newList[i-1] as Float
-                    var second = newList[i+1] as Float
-                    if (operator == "x"){
-                        calculator.multi(first, second)
-                    }
-                    else if (operator == "/"){
-                        calculator.division(first, second)
-                    }
-                    else{
-                        lastList.add(first)
-                        lastList.add(operator)
-                        lastList.add(second)
-                    }
-                }
-                if (i > restartIndex){
-                    lastList.add(newList[i])
-                }
-            }
-
+            list = calcTurn(list)
         }
         return list
     }
 
     private fun calcTurn(list: MutableList<Any>): MutableList<Any>{
-        var newList = list
+        var newList = mutableListOf<Any>()
         var restartIndex = newList.size
 
         for (i in list.indices){
-            if (list[i] is Char && i != list.lastIndex && i < restartIndex){
+            if (list[i] is Char && i != list.lastIndex && i < restartIndex) {
                 var operator = list[i]
-                var first = list[i-1] as Float
-                var second = list[i+1] as Float
-                if (operator == 'x'){
-                    newList.add(calculator.multi(first, second))
+                var first = list[i - 1] as Float
+                var second = list[i + 1] as Float
+
+                when (operator) {
+                    'x' -> {
+                        newList.add(first * second)
+                        restartIndex = i + 1
+                    }
+                    '/' -> {
+                        newList.add(first / second)
+                        restartIndex = i + 1
+                    }
+                    else -> {
+                        newList.add(list[i])
+                    }
                 }
-                else if (operator == '/'){
-                    newList.add(calculator.division(first, second))
-                }
-                else{
-                    newList.add(first)
-                    newList.add(operator)
-                    newList.add(second)
-                }
-            }
-            if (i > restartIndex){
-                newList.add(list[i])
             }
         }
 
